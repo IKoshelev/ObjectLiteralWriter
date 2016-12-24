@@ -223,13 +223,6 @@ null,
                 new object(),
             };
 
-            var b = @"{
-{
-a = "" '1' "" '2 '"";
-}
-}";
-            var a = global::ObjectLiteralWriter.Util.Indent(b);
-
             Util.AssertTypeLiteral(subj,
 @"new Object[]
 {

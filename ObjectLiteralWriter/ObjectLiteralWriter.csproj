@@ -42,7 +42,6 @@
     <Compile Include="ObjectLiteralWriter.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="TypeExtensions.cs" />
-    <Compile Include="Util.cs" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="obj\" />
