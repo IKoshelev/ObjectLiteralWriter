@@ -1,9 +1,9 @@
 # ObjectLiteralWriter
 Convert arbitrary .NET objects into strings containing their construction literal in C#
 
-Ever had a case when you need to prepare data for a unit test, you have suitable object during runtime (i.e. you got if from DB) and you need to produce its literal for use in that test? ObjectLiteralWriter solver this problem.
+Ever had a case when you need to prepare data for a unit test, you have suitable object during runtime (i.e. you got if from DB) and you need to produce its literal for use in that test? ObjectLiteralWriter solves this problem.
 
-It will handle collections, primitive values, complext types, nested objects, etc...
+It will handle primitive values, complex types, nested objects, collections,  etc...
 ```C#
 var subj = new object[]
 {
