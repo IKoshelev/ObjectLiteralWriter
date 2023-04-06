@@ -8,7 +8,7 @@ namespace ObjectLiteralWriter
 {
     public static class TypeExtensions
     {
-        public static Dictionary<Type, string> NumericSufixes = new Dictionary<Type, string>()
+        public static Dictionary<Type, string> NumericSuffixes = new Dictionary<Type, string>()
         {
             {typeof (Byte), ""},
             {typeof (SByte), ""},
@@ -25,12 +25,12 @@ namespace ObjectLiteralWriter
 
         public static bool IsNumeric(this Type type)
         {
-            return NumericSufixes.Keys.Contains(type);
+            return NumericSuffixes.Keys.Contains(type);
         }
 
         public static string GetNumericSuffix(this Type type)
         {
-            return NumericSufixes[type];
+            return NumericSuffixes[type];
         }
 
         public static bool IsExactlyIDictionaryT(this Type type)
@@ -57,7 +57,40 @@ namespace ObjectLiteralWriter
                     || type.GetInterfaces().Any(IsExactlyIEnumerableT);
         }
 
-        public static bool IsTupleT(this Type type)
+        public static bool IsDateOnly(this Type type)
+        {
+            return type.FullName == "System.DateOnly";
+        }
+
+        public static bool IsTimeOnly(this Type type)
+        {
+            return type.FullName == "System.TimeOnly";
+        }
+
+        public static bool IsValueTupleT(this Type type)
+        {
+            if (type.IsGenericType == false)
+            {
+                return false;
+            }
+
+            var tupleTypes = new[]
+            {
+                typeof (ValueTuple<>),
+                typeof (ValueTuple<,>),
+                typeof (ValueTuple<,,>),
+                typeof (ValueTuple<,,,>),
+                typeof (ValueTuple<,,,,>),
+                typeof (ValueTuple<,,,,,>),
+                typeof (ValueTuple<,,,,,,>),
+                typeof (ValueTuple<,,,,,,,>)
+            };
+
+            var genericType = type.GetGenericTypeDefinition();
+            return tupleTypes.Contains(genericType);
+        }
+
+        public static bool IsReferenceTupleT(this Type type)
         {
             if (type.IsGenericType == false)
             {

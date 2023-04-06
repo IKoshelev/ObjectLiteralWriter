@@ -1,10 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using NUnit.Framework;
-using NUnit.Framework.Constraints;
 
 namespace ObjectLiteralWriter.Test
 {
@@ -17,23 +14,23 @@ namespace ObjectLiteralWriter.Test
             Assert.AreEqual(expectedLiteral, output);
         }
 
-        public static void AssertEtaloneMatch(this ValueLiteralPair etalone)
+        public static void AssertEtalonMatch(this ValueLiteralPair etalon)
         {
             var writer = new ObjectLiteralWriter();
-            var output = writer.GetLiteral(etalone.Value);
-            Assert.AreEqual(etalone.Literal, output);
+            var output = writer.GetLiteral(etalon.Value);
+            Assert.AreEqual(etalon.Literal, output);
         }
 
-        public static void AssertEtaloneMatch(this IEnumerable<ValueLiteralPair> etalones)
+        public static void AssertEtalonMatch(this IEnumerable<ValueLiteralPair> etalons)
         {
-            etalones.ForEach(AssertEtaloneMatch);
+            etalons.ForEach(AssertEtalonMatch);
         }
 
-        public static void ForEach<T>(this IEnumerable<T> items, Action<T> aciton)
+        public static void ForEach<T>(this IEnumerable<T> items, Action<T> action)
         {
             foreach (T item in items)
             {
-                aciton(item);
+                action(item);
             }
         }
     }
@@ -65,7 +62,7 @@ namespace ObjectLiteralWriter.Test
         Eight = 8
     }
 
-    public static class Etalone
+    public static class Etalon
     {
         public static ValueLiteralPair[] All
         {
@@ -76,6 +73,7 @@ namespace ObjectLiteralWriter.Test
                           .Union(Text)
                           .Union(Enums)
                           .Union(Time)
+                          .Union(Guid)
                           .ToArray();
             }
         }
@@ -119,14 +117,14 @@ namespace ObjectLiteralWriter.Test
             new ValueLiteralPair((Single)0, "0F"),
             new ValueLiteralPair((Single)123.123F, "123.123F"),
             new ValueLiteralPair((Single)(-123.123F), "-123.123F"),
-            new ValueLiteralPair(Single.MaxValue, "3.402823E+38F"),
-            new ValueLiteralPair(Single.MinValue, "-3.402823E+38F"),
+            new ValueLiteralPair(Single.MaxValue, "3.4028235E+38F"),
+            new ValueLiteralPair(Single.MinValue, "-3.4028235E+38F"),
 
             new ValueLiteralPair((Double)0, "0D"),
             new ValueLiteralPair((Double)123456.123456D, "123456.123456D"),
             new ValueLiteralPair((Double)(-123456.123456D), "-123456.123456D"),
-            new ValueLiteralPair(Double.MaxValue, "1.79769313486232E+308D"),
-            new ValueLiteralPair(Double.MinValue, "-1.79769313486232E+308D"),
+            new ValueLiteralPair(Double.MaxValue, "1.7976931348623157E+308D"),
+            new ValueLiteralPair(Double.MinValue, "-1.7976931348623157E+308D"),
 
             new ValueLiteralPair((Decimal)0, "0M"),
             new ValueLiteralPair((Decimal)123456789.123456789m, "123456789.123456789M"),
@@ -159,15 +157,26 @@ namespace ObjectLiteralWriter.Test
 
         public static ValueLiteralPair[] Time =
         {
-            new ValueLiteralPair(new DateTime(1, 1, 1), "new DateTime(1, 1, 1)"),
-            new ValueLiteralPair(new DateTime(1, 2, 3), "new DateTime(1, 2, 3)"),
-            new ValueLiteralPair(new DateTime(1, 2, 3, 4, 0, 0), "new DateTime(1, 2, 3, 4, 0, 0)"),
-            new ValueLiteralPair(new DateTime(1, 2, 3, 4, 5, 0), "new DateTime(1, 2, 3, 4, 5, 0)"),
-            new ValueLiteralPair(new DateTime(1, 2, 3, 4, 5, 6), "new DateTime(1, 2, 3, 4, 5, 6)"),
+            new ValueLiteralPair(new DateTime(1, 1, 1), "new DateTime(1, 1, 1, 0, 0, 0, DateTimeKind.Unspecified)"),
+            new ValueLiteralPair(new DateTime(1, 2, 3), "new DateTime(1, 2, 3, 0, 0, 0, DateTimeKind.Unspecified)"),
+            new ValueLiteralPair(new DateTime(1, 2, 3, 4, 0, 0, DateTimeKind.Utc), "new DateTime(1, 2, 3, 4, 0, 0, DateTimeKind.Utc)"),
+            new ValueLiteralPair(new DateTime(1, 2, 3, 4, 5, 0, DateTimeKind.Local), "new DateTime(1, 2, 3, 4, 5, 0, DateTimeKind.Local)"),
+            new ValueLiteralPair(new DateTime(1, 2, 3, 4, 5, 6), "new DateTime(1, 2, 3, 4, 5, 6, DateTimeKind.Unspecified)"),
+            new ValueLiteralPair(new DateTime(1, 2, 3, 4, 0, 0, 1, DateTimeKind.Utc), "new DateTime(1, 2, 3, 4, 0, 0, 1, DateTimeKind.Utc)"),
 
             new ValueLiteralPair(new TimeSpan(1, 2, 3), "new TimeSpan(1, 2, 3)"),
             new ValueLiteralPair(new TimeSpan(1, 2, 3, 4), "new TimeSpan(1, 2, 3, 4)"),
             new ValueLiteralPair(new TimeSpan(1, 2, 3, 4, 5), "new TimeSpan(1, 2, 3, 4, 5)"),
+
+            new ValueLiteralPair(new DateTimeOffset(1, 2, 3, 4, 5, 6, 7, new TimeSpan(1, 30, 0)), "new DateTimeOffset(1, 2, 3, 4, 5, 6, 7, new TimeSpan(1, 30, 0))"),
+
+            new ValueLiteralPair(new DateOnly(2000, 5, 20), "new DateOnly(2000, 5, 20)"),
+            new ValueLiteralPair(new TimeOnly(1, 2, 3, 4), "new TimeOnly(1, 2, 3, 4)"),
+        };
+
+        public static  ValueLiteralPair[] Guid = 
+        {
+             new ValueLiteralPair(System.Guid.Parse("d237f51b-61ec-4a53-a6df-56aeaee6bb68"), "Guid.Parse(\"d237f51b-61ec-4a53-a6df-56aeaee6bb68\")"),
         };
     }
 }

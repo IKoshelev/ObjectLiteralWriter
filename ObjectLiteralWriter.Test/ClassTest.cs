@@ -94,9 +94,9 @@ Bar = null,
         }
 
         [Test]
-        public void CanHandleBuiltinPropertiesAndFeilds()
+        public void CanHandleBuiltinPropertiesAndFields()
         {
-            Etalone.All.ForEach(vlp =>
+            Etalon.All.ForEach(vlp =>
             {
                 Type targetType = vlp.Value.GetType();
                 Type closedType = typeof(Test5<>).MakeGenericType(targetType);
@@ -120,7 +120,7 @@ Bar = " + vlp.Literal + @",
         [Test]
         public void CanHandleNullables()
         {
-            Etalone.All.ForEach(vlp =>
+            Etalon.All.ForEach(vlp =>
             {
                 Type targetType = vlp.Value.GetType();
                 if (targetType.IsValueType == false)

@@ -5,7 +5,6 @@ using System.Text;
 using System.Threading.Tasks;
 using NUnit.Framework;
 using ObjectLiteralWriter;
-using Assert = Microsoft.VisualStudio.TestTools.UnitTesting.Assert;
 
 namespace ObjectLiteralWriter.Test
 {

@@ -116,7 +116,7 @@ namespace ObjectLiteralWriter
 
             if (targetType.IsNumeric())
             {
-                var currentCultrue = Thread.CurrentThread.CurrentCulture;
+                var currentCulture = Thread.CurrentThread.CurrentCulture;
                 try
                 {
                     Thread.CurrentThread.CurrentCulture = System.Globalization.CultureInfo.InvariantCulture;
@@ -126,7 +126,7 @@ namespace ObjectLiteralWriter
                 }
                 finally
                 {
-                    Thread.CurrentThread.CurrentCulture = currentCultrue;
+                    Thread.CurrentThread.CurrentCulture = currentCulture;
                 }             
             }
 
@@ -154,6 +154,18 @@ namespace ObjectLiteralWriter
                 return;
             }
 
+            if (targetType == typeof(Guid))
+            {
+                AppendGuid((Guid)target);
+                return;
+            }
+
+            if (targetType == typeof(DateTimeOffset))
+            {
+                AppendDateTimeOffset((DateTimeOffset)target);
+                return;
+            }
+
             if (targetType == typeof(DateTime))
             {
                 AppendDateTime((DateTime)target);
@@ -163,6 +175,18 @@ namespace ObjectLiteralWriter
             if (targetType == typeof(TimeSpan))
             {
                 AppendTimeSpan((TimeSpan)target);
+                return;
+            }
+
+            if (targetType.IsDateOnly())
+            {
+                AppendDateOnly(target);
+                return;
+            }
+
+            if (targetType.IsTimeOnly())
+            {
+                AppendTimeOnly(target);
                 return;
             }
 
@@ -178,19 +202,30 @@ namespace ObjectLiteralWriter
                 return;
             }
 
-            if (targetType.IsTupleT())
+            if (targetType.IsValueTupleT())
             {
-                AppendTuple(targetType, target);
+                AppendValueTuple(targetType, target);
+                return;
+            }
+
+            if (targetType.IsReferenceTupleT())
+            {
+                AppendReferenceTuple(targetType, target);
                 return;
             }
 
             AppendClass(targetType, target);
         }
 
-        private void AppendTuple(Type targetType, object target)
+        private void AppendGuid(Guid target)
+        {
+            _builder.AppendFormat("Guid.Parse(\"{0}\")", target);
+        }
+
+        private void AppendReferenceTuple(Type targetType, object target)
         {
             var genericTypes = targetType.GetGenericArguments();
-            var argumentNames = genericTypes.Select(GetClassConsrtuctorName).ToArray();
+            var argumentNames = genericTypes.Select(GetClassConstructorName).ToArray();
             var argumentValues = Enumerable
                 .Range(1, genericTypes.Length)
                 .Select(count => count == 8 ? "Rest" : ("Item" + count))
@@ -205,12 +240,39 @@ namespace ObjectLiteralWriter
                 string.Join(", ", argumentValues));
         }
 
+        private void AppendValueTuple(Type targetType, object target)
+        {
+            List<string> arguments = new List<string>();
+
+            for (var count = 0; count < targetType.GetGenericArguments().Length; count++)
+            {
+                // ValueTuples still used Rest tuples when there is more than 7 items,
+                // but the literal does not use it, so we have to flatten
+                if (count == 7) 
+                {
+                    target = targetType.GetField("Rest").GetValue(target);
+                    targetType = target.GetType();
+                    count = -1;
+                    continue;
+                }
+
+                var value = targetType
+                                .GetField($"Item{count + 1}")
+                                .GetValue(target);
+
+                arguments.Add(this.Clone().GetLiteral(value));
+            }
+
+            _builder.AppendFormat("({0})",
+                string.Join(", ", arguments));
+        }
+
         private void AppendEnumerable(Type targetType, object target, bool useGenericTypesFromTargetForLiterals)
         {
             var enumerableType = GetIEnumerableTypeOfType(targetType);
 
             var genericType = enumerableType.GetGenericArguments()[0];
-            var typeName = GetClassConsrtuctorName(genericType);
+            var typeName = GetClassConstructorName(genericType);
             var itemAddingSection = useGenericTypesFromTargetForLiterals
                 ? GetArrayItemAddingSection(target, genericType)
                 : GetArrayItemAddingSection(target);
@@ -240,8 +302,8 @@ namespace ObjectLiteralWriter
 
         private object GetArrayItemAddingSection(object target, Type itemTypeOverride = null)
         {
-            var enumerabeTarget = (IEnumerable)target;
-            var itemInits = enumerabeTarget
+            var enumerableTarget = (IEnumerable)target;
+            var itemInits = enumerableTarget
                 .Cast<object>()
                 .Select(item =>
                 {
@@ -260,9 +322,9 @@ namespace ObjectLiteralWriter
 
             var genericTypes = dictType.GetGenericArguments();
             var keyType = genericTypes[0];
-            var keyTypeName = GetClassConsrtuctorName(keyType);
+            var keyTypeName = GetClassConstructorName(keyType);
             var valueType = genericTypes[1];
-            var valueTypeName = GetClassConsrtuctorName(valueType);
+            var valueTypeName = GetClassConstructorName(valueType);
             var itemAddingSection = useGenericTypesFromTargetForLiterals
                 ? GetDictItemAddingSection(target, keyType, valueType)
                 : GetDictItemAddingSection(target);
@@ -303,16 +365,16 @@ namespace ObjectLiteralWriter
 
         private void AppendClass(Type targetType, object target)
         {
-            string fieldInitiSection = GetFieldInitSection(targetType, target);
-            string propertieInitiSection = GetPropertyInitSection(targetType, target);
-            string classConstructorName = GetClassConsrtuctorName(targetType);
+            string fieldInitSection = GetFieldInitSection(targetType, target);
+            string propertyInitSection = GetPropertyInitSection(targetType, target);
+            string classConstructorName = GetClassConstructorName(targetType);
             _builder.AppendFormat("new {0}()\r\n{{\r\n", classConstructorName);
-            _builder.Append(fieldInitiSection);
-            _builder.Append(propertieInitiSection);
+            _builder.Append(fieldInitSection);
+            _builder.Append(propertyInitSection);
             _builder.Append("}");
         }
 
-        private string GetClassConsrtuctorName(Type targetType)
+        private string GetClassConstructorName(Type targetType)
         {
             if (targetType.IsGenericType == false)
             {
@@ -321,12 +383,12 @@ namespace ObjectLiteralWriter
 
             if (targetType.GetGenericTypeDefinition() == typeof(Nullable<>))
             {
-                return targetType.GetGenericArguments().Select(GetClassConsrtuctorName).Single() + "?";
+                return targetType.GetGenericArguments().Select(GetClassConstructorName).Single() + "?";
             }
 
             var baseType = targetType.GetGenericTypeDefinition();
             var name = baseType.Name.Split('`')[0];
-            var paramNames = targetType.GetGenericArguments().Select(GetClassConsrtuctorName);
+            var paramNames = targetType.GetGenericArguments().Select(GetClassConstructorName);
             var constructorName = name + "<" + string.Join(",", paramNames) + ">";
             return constructorName;
         }
@@ -384,17 +446,66 @@ namespace ObjectLiteralWriter
             return CustomMemberWriter(propInfo, fieldInfo, target);
         }
 
+        
+        private void AppendDateOnly(object target)
+        {
+            var targetType = target.GetType();
+            _builder.AppendFormat("new DateOnly({0}, {1}, {2})",
+                targetType.GetProperty("Year").GetValue(target),
+                targetType.GetProperty("Month").GetValue(target),
+                targetType.GetProperty("Day").GetValue(target));
+        }
+
+        private void AppendTimeOnly(object target)
+        {
+            var targetType = target.GetType();
+           _builder.AppendFormat("new TimeOnly({0}, {1}, {2}, {3})",
+                targetType.GetProperty("Hour").GetValue(target),
+                targetType.GetProperty("Minute").GetValue(target),
+                targetType.GetProperty("Second").GetValue(target),
+                targetType.GetProperty("Millisecond").GetValue(target));
+        }
+
+        private void AppendDateTimeOffset(DateTimeOffset target)
+        {
+              _builder.AppendFormat("new DateTimeOffset({0}, {1}, {2}, {3}, {4}, {5}, {6}, {7})",
+                    target.Year, 
+                    target.Month, 
+                    target.Day, 
+                    target.Hour, 
+                    target.Minute, 
+                    target.Second,
+                    target.Millisecond,
+                    this.Clone().GetLiteral(target.Offset));
+        }
+
         private void AppendDateTime(DateTime target)
         {
-            if (target.Second != 0 || target.Minute != 0 || target.Hour != 0)
+            if (target.Millisecond != 0)
             {
-                _builder.AppendFormat("new DateTime({0}, {1}, {2}, {3}, {4}, {5})",
-                    target.Year, target.Month, target.Day, target.Hour, target.Minute, target.Second);
+                    _builder.AppendFormat("new DateTime({0}, {1}, {2}, {3}, {4}, {5}, {6}, {7})",
+                    target.Year, 
+                    target.Month, 
+                    target.Day, 
+                    target.Hour, 
+                    target.Minute, 
+                    target.Second,
+                    target.Millisecond,
+                    $"DateTimeKind.{target.Kind}");
                 return;
             }
 
-            _builder.AppendFormat("new DateTime({0}, {1}, {2})",
-                    target.Year, target.Month, target.Day);
+            _builder.AppendFormat("new DateTime({0}, {1}, {2}, {3}, {4}, {5}, {6})",
+                target.Year, 
+                target.Month, 
+                target.Day, 
+                target.Hour, 
+                target.Minute, 
+                target.Second, 
+                $"DateTimeKind.{target.Kind}");
+            return;
+            
+
         }
 
         private void AppendTimeSpan(TimeSpan target)

@@ -11,31 +11,37 @@ namespace ObjectLiteralWriter.Test
         [Test]
         public void CanHandleBooleans()
         {
-            Etalone.Booleans.AssertEtaloneMatch();
+            Etalon.Booleans.AssertEtalonMatch();
         }
 
         [Test]
         public void CanHandleNumerics()
         {
-            Etalone.Numerics.AssertEtaloneMatch();
+            Etalon.Numerics.AssertEtalonMatch();
         }
 
         [Test]
         public void CanHandleText()
         {
-            Etalone.Text.AssertEtaloneMatch();
+            Etalon.Text.AssertEtalonMatch();
         }
 
         [Test]
         public void CanHandleEnums()
         {
-            Etalone.Enums.AssertEtaloneMatch();
+            Etalon.Enums.AssertEtalonMatch();
         }
 
         [Test]
         public void CanHandleDateTime()
         {
-            Etalone.Time.AssertEtaloneMatch();
+            Etalon.Time.AssertEtalonMatch();
+        }
+
+        [Test]
+        public void CanHandleGuid()
+        {
+            Etalon.Guid.AssertEtalonMatch();
         }
     }
 }

@@ -12,7 +12,7 @@ namespace ObjectLiteralWriter.Test
         public void CustomLiteralWriterReturningNullMeansUseDefaultWriter()
         {
             var subj = new object();
-            var writer = new ObjectLiteralWriter { CustomLiteralWriter = (type, targer) => null };
+            var writer = new ObjectLiteralWriter { CustomLiteralWriter = (type, target) => null };
             var output = writer.GetLiteral(subj);
             Assert.AreEqual("new object()", output);
         }
@@ -21,11 +21,11 @@ namespace ObjectLiteralWriter.Test
         public void CustomLiteralWriterReturningAnyStringMeansLiteralIsHandled()
         {
             var subj = new object();
-            var writer = new ObjectLiteralWriter { CustomLiteralWriter = (type, targer) => string.Empty };
+            var writer = new ObjectLiteralWriter { CustomLiteralWriter = (type, target) => string.Empty };
             var output = writer.GetLiteral(subj);
             Assert.AreEqual("", output);
 
-            writer = new ObjectLiteralWriter { CustomLiteralWriter = (type, targer) => "FOOBAR" };
+            writer = new ObjectLiteralWriter { CustomLiteralWriter = (type, target) => "FOOBAR" };
             output = writer.GetLiteral(subj);
             Assert.AreEqual("FOOBAR", output);
         }
@@ -37,7 +37,7 @@ namespace ObjectLiteralWriter.Test
         }
 
         [Test]
-        public void CustoMemberWriterReturningNullMeansUseDefaultWriter()
+        public void CustomMemberWriterReturningNullMeansUseDefaultWriter()
         {
             var subj = new Test1();
             var writer = new ObjectLiteralWriter { CustomMemberWriter = (propInfo, fieldInfo, target) => null };
@@ -51,7 +51,7 @@ Bar = 0,
         }
 
         [Test]
-        public void CustoMemberWriterReturningAnyStringMeansLiteralIsHandled()
+        public void CustomMemberWriterReturningAnyStringMeansLiteralIsHandled()
         {
             var subj = new Test1();
             var writer = new ObjectLiteralWriter
@@ -76,7 +76,7 @@ Bar = 0,
         }
 
         [Test]
-        public void CustoMemberWriterReturningEmptyStringMeansSkipMember()
+        public void CustomMemberWriterReturningEmptyStringMeansSkipMember()
         {
             var subj = new Test1();
             var writer = new ObjectLiteralWriter

@@ -5,7 +5,7 @@ using NUnit.Framework;
 namespace ObjectLiteralWriter.Test
 {
     [TestFixture]
-    public class TupleTest
+    public class ReferenceTupleTest
     {
         [Test]
         public void CanHandleTuple1()
