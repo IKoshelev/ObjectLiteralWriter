@@ -5,7 +5,10 @@ Library is available on NuGet https://www.nuget.org/packages/ObjectLiteralWriter
 
 Ever had a case when you need to prepare data for a unit test, you have suitable object during runtime (i.e. you got if from DB) and you need to produce its literal for use in that test? ObjectLiteralWriter solves this problem.
 
-It will handle primitive values, complex types, nested objects, collections,  etc...
+It will handle primitive values and built-in types, complex classes, nested objects, collections, tuples, etc...
+
+*use your editor of choice to format resulting code*
+
 ```C#
 var subj = new object[]
 {
@@ -75,4 +78,3 @@ null,
 */
 ```
 
-Description of more advanced features coming soon. 

@@ -5,18 +5,25 @@
   </PropertyGroup>
 
   <PropertyGroup>
-        <id>Object.LiteralWriter</id>
-        <version>2.0.0</version>
+        <PackageId>Object.LiteralWriter</PackageId>
+        <version>2.0.1</version>
         <authors>Ivan Koshelev</authors>
         <owners>Ivan Koshelev</owners>
-        <license>https://opensource.org/licenses/MIT</license>
-        <projectUrl>https://github.com/IKoshelev/ObjectLiteralWriter</projectUrl>
+        <PackageLicenseExpression>MIT</PackageLicenseExpression>
+        <PackageProjectUrl>https://github.com/IKoshelev/ObjectLiteralWriter</PackageProjectUrl>
         <requireLicenseAcceptance>false</requireLicenseAcceptance>
         <description>Convert arbitrary .NET objects into strings containing their construction literal in C#.</description>
-        <tags>POCO object literal writer</tags>
+        <PackageTags>POCO object literal writer</PackageTags>
         <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
         <IncludeSymbols>true</IncludeSymbols>
         <SymbolPackageFormat>snupkg</SymbolPackageFormat>
+        <Product />
+        <RepositoryUrl>https://github.com/IKoshelev/ObjectLiteralWriter</RepositoryUrl>
+        <PackageReadmeFile>README.md</PackageReadmeFile>
   </PropertyGroup>
+
+    <ItemGroup>
+        <None Include="..\README.md" Pack="true" PackagePath="\"/>
+    </ItemGroup>
 
 </Project>
