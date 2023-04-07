@@ -7,6 +7,8 @@ Ever had a case when you need to prepare data for a unit test, you have suitable
 
 It will handle primitive values and built-in types, complex classes, nested objects, collections, tuples, etc...
 
+*hint: if you have a json representation of your object - you can run it through deserializer and feed the result into ObjectLiteralWriter*
+
 ```csharp
 using ObjectLiteralWriter;
 
