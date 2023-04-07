@@ -35,8 +35,12 @@ namespace ObjectLiteralWriter.Test
             Util.AssertTypeLiteral(subj,
 @"new Dictionary<String,Int32>()
 {
-{""1"",2},
-{""3"",4},
+{
+""1"",2
+},
+{
+""3"",4
+},
 }");
         }
 
@@ -66,7 +70,8 @@ namespace ObjectLiteralWriter.Test
             Util.AssertTypeLiteral(subj,
 @"new Dictionary<Decimal,Test1>()
 {
-{1.1M,new Test1()
+{
+1.1M,new Test1()
 {
 Foo = 1.1M,
 Bar = new Test1()
@@ -74,9 +79,30 @@ Bar = new Test1()
 Foo = -3.3M,
 Bar = null,
 },
-}},
-{-2.2M,null},
+}
+},
+{
+-2.2M,null
+},
 }");
+
+            Util.AssertTypeLiteral(subj,
+@"new Dictionary<Decimal,Test1>()
+{
+{
+1.1M,new Test1()
+{
+Foo = 1.1M,
+Bar = new Test1()
+{
+Foo = -3.3M,
+},
+}
+},
+{
+-2.2M,null
+},
+}", true);
         }
 
         [Test]
@@ -140,6 +166,20 @@ Bar = null,
 },
 null,
 }");
+
+            Util.AssertTypeLiteral(subj,
+@"new List<Test1>()
+{
+new Test1()
+{
+Foo = 1.1M,
+Bar = new Test1()
+{
+Foo = -3.3M,
+},
+},
+null,
+}", true);
         }
 
         [Test]
@@ -203,6 +243,20 @@ Bar = null,
 },
 null,
 }");
+
+            Util.AssertTypeLiteral(subj,
+@"new Test1[]
+{
+new Test1()
+{
+Foo = 1.1M,
+Bar = new Test1()
+{
+Foo = -3.3M,
+},
+},
+null,
+}", true);
         }
 
         [Test]

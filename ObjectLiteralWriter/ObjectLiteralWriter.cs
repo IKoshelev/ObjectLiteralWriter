@@ -43,15 +43,12 @@ namespace ObjectLiteralWriter
             return new ObjectLiteralWriter()
             {
                 SkipMembersWithDefaultValue = this.SkipMembersWithDefaultValue,
-                Indentation = this.Indentation,
                 CustomLiteralWriter = this.CustomLiteralWriter,
                 CustomMemberWriter = this.CustomMemberWriter
             };
         }
 
         public bool SkipMembersWithDefaultValue { get; set; } = true;
-
-        public string Indentation { get; set; } = "    ";
 
         public Func<Type, object, string> CustomLiteralWriter { get; set; }
 
@@ -356,7 +353,7 @@ namespace ObjectLiteralWriter
                     var keyLiteral = this.Clone().GetLiteral(key, asType: keyTypeOverride);
                     var value = dict[key];
                     var valueLiteral = this.Clone().GetLiteral(value, asType: valueTypeOverride);
-                    return string.Format("{{{0},{1}}},\r\n", keyLiteral, valueLiteral);
+                    return string.Format("{{\r\n{0},{1}\r\n}},\r\n", keyLiteral, valueLiteral);
                 })
                 .ToArray();
 
@@ -409,7 +406,8 @@ namespace ObjectLiteralWriter
                     var value = x.GetValue(target);
                     if (this.SkipMembersWithDefaultValue
                         && value as bool? != false
-                        && (x.FieldType.GetDefaultInstanceValue()?.Equals(value) ?? true))
+                        && (x.FieldType.GetDefaultInstanceValue() == value 
+                            || (x.FieldType.GetDefaultInstanceValue()?.Equals(value) ?? false)))
                     {
                         return "";
                     }
@@ -437,7 +435,8 @@ namespace ObjectLiteralWriter
                     var value = x.GetValue(target, null);
                     if (this.SkipMembersWithDefaultValue
                         && value as bool? != false
-                        && (x.PropertyType.GetDefaultInstanceValue()?.Equals(value) ?? true))
+                         && (x.PropertyType.GetDefaultInstanceValue() == value 
+                            || (x.PropertyType.GetDefaultInstanceValue()?.Equals(value) ?? false)))
                     {
                         return "";
                     }
@@ -587,5 +586,29 @@ namespace ObjectLiteralWriter
             }
             _builder.Append("var " + propertyName + " = ");
         }
+    }
+
+    public static class LiteralExtensions
+    {
+        public static string IndentLiteral(this string literal, string indent = "    ")
+        {
+            var indentLevel = 0;
+
+            var indentedLines = literal.Split('\n').Select(line =>
+            {
+                var indentStr = string.Join("", Enumerable.Repeat(indent, indentLevel));
+                if (line.StartsWith("{")){
+                    indentStr = string.Join("", Enumerable.Repeat(indent, indentLevel));
+                    indentLevel += 1;
+                }
+                if (line.StartsWith("}")){
+                    indentLevel -= 1;
+                    indentStr = string.Join("", Enumerable.Repeat(indent, indentLevel));
+                }
+                return indentStr + line;
+            });
+
+            return String.Join("\n", indentedLines);
+        } 
     }
 }

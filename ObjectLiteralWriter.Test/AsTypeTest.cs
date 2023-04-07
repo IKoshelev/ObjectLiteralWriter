@@ -90,7 +90,9 @@ T1 = 1,
             Assert.AreEqual(
 @"new Dictionary<Int32,Int32>()
 {
-{1,2},
+{
+1,2
+},
 }"
 , output);
 

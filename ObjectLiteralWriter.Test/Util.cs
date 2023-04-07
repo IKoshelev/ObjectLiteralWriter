@@ -10,13 +10,11 @@ namespace ObjectLiteralWriter.Test
         public static void AssertTypeLiteral<T>(
             T target, 
             string expectedLiteral, 
-            bool skipMembersWithDefaultValue = false,
-            string indentation = "")
+            bool skipMembersWithDefaultValue = false)
         {
             var writer = new ObjectLiteralWriter()
             {
-                SkipMembersWithDefaultValue = skipMembersWithDefaultValue,
-                Indentation = indentation
+                SkipMembersWithDefaultValue = skipMembersWithDefaultValue
             };
             var output = writer.GetLiteral(target);
             Assert.AreEqual(expectedLiteral, output);
