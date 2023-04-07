@@ -12,7 +12,7 @@
         <PackageLicenseExpression>MIT</PackageLicenseExpression>
         <PackageProjectUrl>https://github.com/IKoshelev/ObjectLiteralWriter</PackageProjectUrl>
         <requireLicenseAcceptance>false</requireLicenseAcceptance>
-        <description>Convert arbitrary .NET objects into strings containing their construction literal in C#.</description>
+        <description>Convert arbitrary .NET objects at runtime into strings containing their full construction literal in C#.</description>
         <PackageTags>POCO object literal writer</PackageTags>
         <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
         <IncludeSymbols>true</IncludeSymbols>

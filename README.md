@@ -1,7 +1,7 @@
 # ObjectLiteralWriter
 Convert arbitrary .NET objects at runtime into strings containing their construction literal in C#
 
-Library is available on NuGet https://www.nuget.org/packages/ObjectLiteralWriter/
+Library is available on NuGet https://www.nuget.org/packages/Object.LiteralWriter/
 
 Ever had a case when you need to prepare data for a unit test, you have suitable object during runtime (i.e. you got it from DB or another service) and you need to produce its literal for use in that test? ObjectLiteralWriter solves this problem.
 
