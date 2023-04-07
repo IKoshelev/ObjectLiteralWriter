@@ -34,28 +34,28 @@ namespace ObjectLiteralWriter
 
     public class ObjectLiteralWriter : IObjectLiteralWriter
     {
+
+
         private StringBuilder _builder;
 
         public IObjectLiteralWriter Clone()
         {
             return new ObjectLiteralWriter()
             {
-                CustomLiteralWriter = CustomLiteralWriter,
-                CustomMemberWriter = CustomMemberWriter
+                SkipMembersWithDefaultValue = this.SkipMembersWithDefaultValue,
+                Indentation = this.Indentation,
+                CustomLiteralWriter = this.CustomLiteralWriter,
+                CustomMemberWriter = this.CustomMemberWriter
             };
         }
 
-        public Func<Type, object, string> CustomLiteralWriter
-        {
-            get;
-            set;
-        }
+        public bool SkipMembersWithDefaultValue { get; set; } = true;
 
-        public Func<PropertyInfo, FieldInfo, object, string> CustomMemberWriter
-        {
-            get;
-            set;
-        }
+        public string Indentation { get; set; } = "    ";
+
+        public Func<Type, object, string> CustomLiteralWriter { get; set; }
+
+        public Func<PropertyInfo, FieldInfo, object, string> CustomMemberWriter { get; set; }
 
         public string GetLiteral(
             object target,
@@ -407,6 +407,12 @@ namespace ObjectLiteralWriter
 
                     var fieldName = x.Name;
                     var value = x.GetValue(target);
+                    if (this.SkipMembersWithDefaultValue
+                        && value as bool? != false
+                        && (x.FieldType.GetDefaultInstanceValue()?.Equals(value) ?? true))
+                    {
+                        return "";
+                    }
                     var valueLiteral = this.Clone().GetLiteral(value);
                     return string.Format("{0} = {1},\r\n", fieldName, valueLiteral);
                 })
@@ -429,6 +435,12 @@ namespace ObjectLiteralWriter
 
                     var fieldName = x.Name;
                     var value = x.GetValue(target, null);
+                    if (this.SkipMembersWithDefaultValue
+                        && value as bool? != false
+                        && (x.PropertyType.GetDefaultInstanceValue()?.Equals(value) ?? true))
+                    {
+                        return "";
+                    }
                     var valueLiteral = this.Clone().GetLiteral(value);
                     return string.Format("{0} = {1},\r\n", fieldName, valueLiteral);
                 })

@@ -104,7 +104,10 @@ Bar = null,
                 closedType.GetField("Foo").SetValue(target, vlp.Value);
                 closedType.GetProperty("Bar").SetValue(target, vlp.Value, null);
 
-                var writer = new ObjectLiteralWriter();
+                var writer = new ObjectLiteralWriter()
+                {
+                    SkipMembersWithDefaultValue = false
+                };
                 var output = writer.GetLiteral(target);
 
                 var expectedOutput = @"new Test5<" + targetType.Name + @">()
@@ -131,7 +134,10 @@ Bar = " + vlp.Literal + @",
                 Type closedType = typeof(Test5<>).MakeGenericType(targetType);
                 object target = Activator.CreateInstance(closedType);
 
-                var writer = new ObjectLiteralWriter();
+                var writer = new ObjectLiteralWriter()
+                {
+                    SkipMembersWithDefaultValue = false
+                };
                 var output = writer.GetLiteral(target);
 
                 closedType.GetField("Foo").SetValue(target, vlp.Value);

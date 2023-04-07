@@ -86,6 +86,21 @@ Bar = null,
 }");
         }
 
+                [Test]
+        public void CanSkipNullsForClasses()
+        {
+            var subj = new Test4()
+            {
+            };
+
+            Util.AssertTypeLiteral(subj,
+                @"new Test4()
+{
+}",
+
+skipMembersWithDefaultValue: true);
+        }
+
         public class Test5<T>
         {
             public T Foo;
@@ -104,7 +119,10 @@ Bar = null,
                 closedType.GetField("Foo").SetValue(target, vlp.Value);
                 closedType.GetProperty("Bar").SetValue(target, vlp.Value, null);
 
-                var writer = new ObjectLiteralWriter();
+                var writer = new ObjectLiteralWriter()
+                {
+                    SkipMembersWithDefaultValue = false
+                };
                 var output = writer.GetLiteral(target);
 
                 var expectedOutput = @"new Test5<" + targetType.Name + @">()
@@ -131,7 +149,10 @@ Bar = " + vlp.Literal + @",
                 Type closedType = typeof(Test5<>).MakeGenericType(targetType);
                 object target = Activator.CreateInstance(closedType);
 
-                var writer = new ObjectLiteralWriter();
+                var writer = new ObjectLiteralWriter()
+                {
+                    SkipMembersWithDefaultValue = false
+                };
                 var output = writer.GetLiteral(target);
 
                 closedType.GetField("Foo").SetValue(target, vlp.Value);
@@ -182,6 +203,41 @@ Foo = new object(),
 Bar = new object(),
 },
 }");
+        }
+
+        public class TestGeneric<T1,T2>
+        {
+            public T1 T_1 { get; set; }
+            public T2 T_2 { get; set; }
+        }
+
+        [Test]
+        public void CanSkipDefaultValuesExceptBooleans()
+        {
+            var subj = new TestGeneric<object, decimal>
+            {
+                T_1 = null,
+                T_2 = default,
+            };
+
+            Util.AssertTypeLiteral(subj,
+@"new TestGeneric<Object,Decimal>()
+{
+}",
+skipMembersWithDefaultValue: true);
+
+            var subj2 = new TestGeneric<bool, Guid>
+            {
+                T_1 = default,
+                T_2 = default,
+            };
+
+            Util.AssertTypeLiteral(subj2,
+@"new TestGeneric<Boolean,Guid>()
+{
+T_1 = false,
+}",
+skipMembersWithDefaultValue: true);
         }
     }
 }

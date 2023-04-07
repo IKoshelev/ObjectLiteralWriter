@@ -7,9 +7,17 @@ namespace ObjectLiteralWriter.Test
 {
     public static class Util
     {
-        public static void AssertTypeLiteral<T>(T target, string expectedLiteral)
+        public static void AssertTypeLiteral<T>(
+            T target, 
+            string expectedLiteral, 
+            bool skipMembersWithDefaultValue = false,
+            string indentation = "")
         {
-            var writer = new ObjectLiteralWriter();
+            var writer = new ObjectLiteralWriter()
+            {
+                SkipMembersWithDefaultValue = skipMembersWithDefaultValue,
+                Indentation = indentation
+            };
             var output = writer.GetLiteral(target);
             Assert.AreEqual(expectedLiteral, output);
         }

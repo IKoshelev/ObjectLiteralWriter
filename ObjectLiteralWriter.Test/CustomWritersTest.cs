@@ -40,7 +40,11 @@ namespace ObjectLiteralWriter.Test
         public void CustomMemberWriterReturningNullMeansUseDefaultWriter()
         {
             var subj = new Test1();
-            var writer = new ObjectLiteralWriter { CustomMemberWriter = (propInfo, fieldInfo, target) => null };
+            var writer = new ObjectLiteralWriter 
+            { 
+                CustomMemberWriter = (propInfo, fieldInfo, target) => null, 
+                SkipMembersWithDefaultValue = false
+            };
             var output = writer.GetLiteral(subj);
             Assert.AreEqual(
 @"new Test1()
@@ -64,7 +68,8 @@ Bar = 0,
                     }
 
                     return null;
-                }
+                },
+                SkipMembersWithDefaultValue = false
             };
             var output = writer.GetLiteral(subj);
             Assert.AreEqual(
@@ -89,7 +94,8 @@ Bar = 0,
                     }
 
                     return null;
-                }
+                },
+                SkipMembersWithDefaultValue = false
             };
             var output = writer.GetLiteral(subj);
             Assert.AreEqual(

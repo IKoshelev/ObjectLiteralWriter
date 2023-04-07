@@ -117,7 +117,10 @@ Value = 2,
                 new Test2()
             };
 
-            var writer = new ObjectLiteralWriter();
+            var writer = new ObjectLiteralWriter()
+            {
+                SkipMembersWithDefaultValue = false
+            };
             var output = writer.GetLiteral(subj);
 
             Assert.AreEqual(

@@ -112,5 +112,14 @@ namespace ObjectLiteralWriter
             var genericType = type.GetGenericTypeDefinition();
             return tupleTypes.Contains(genericType);
         }
+
+        public static object GetDefaultInstanceValue(this Type type)
+        {
+            var res = type.IsValueType 
+                            ? Activator.CreateInstance(type) 
+                            : null;
+            //System.Console.WriteLine($"For {type.Name}: {res}");
+            return res;
+        }
     }
 }
