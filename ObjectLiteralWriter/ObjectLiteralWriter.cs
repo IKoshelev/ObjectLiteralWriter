@@ -15,14 +15,29 @@ namespace ObjectLiteralWriter
             string propertyName = null,
             bool includeSemicolon = false,
             Type asType = null,
-            bool useCollectionGenericTypeForItemLiterals = false);
+            bool useCollectionGenericTypeForItemLiterals = false,
+            string indentation = null);
 
+        /// <summary>
+        /// Function will get a chance to examine values 
+        /// that are being converted to literals.
+        /// Return literal string to write it.
+        /// Return null to fallback to default literal writer.
+        /// Return empty string to skip writing this value.
+        /// </summary>
         Func<Type, object, string> CustomLiteralWriter
         {
             get;
             set;
         }
 
+        /// <summary>
+        /// Function will get a chance to examine type members
+        /// that are being converted to literals.
+        /// Return literal string to write it.
+        /// Return null to fallback to default literal writer.
+        /// Return empty string to skip writing this member.
+        /// </summary>
         Func<PropertyInfo, FieldInfo, object, string> CustomMemberWriter
         {
             get;
@@ -34,8 +49,6 @@ namespace ObjectLiteralWriter
 
     public class ObjectLiteralWriter : IObjectLiteralWriter
     {
-
-
         private StringBuilder _builder;
 
         public IObjectLiteralWriter Clone()
@@ -50,8 +63,22 @@ namespace ObjectLiteralWriter
 
         public bool SkipMembersWithDefaultValue { get; set; } = true;
 
+        /// <summary>
+        /// Function will get a chance to examine values 
+        /// that are being converted to literals.
+        /// Return literal string to write it.
+        /// Return null to fallback to default literal writer.
+        /// Return empty string to skip writing this value.
+        /// </summary>
         public Func<Type, object, string> CustomLiteralWriter { get; set; }
 
+        /// <summary>
+        /// Function will get a chance to examine type members
+        /// that are being converted to literals.
+        /// Return literal string to write it.
+        /// Return null to fallback to default literal writer.
+        /// Return empty string to skip writing this member.
+        /// </summary>
         public Func<PropertyInfo, FieldInfo, object, string> CustomMemberWriter { get; set; }
 
         public string GetLiteral(
@@ -59,7 +86,8 @@ namespace ObjectLiteralWriter
             string propertyName = null,
             bool includeSemicolon = false,
             Type asType = null,
-            bool useCollectionGenericTypeForItemLiterals = false)
+            bool useCollectionGenericTypeForItemLiterals = false,
+            string indentation = null)
         {
             _builder = new StringBuilder();
 
@@ -70,6 +98,11 @@ namespace ObjectLiteralWriter
             if (includeSemicolon)
             {
                 _builder.Append(";");
+            }
+
+            if (indentation != null)
+            {
+                return _builder.ToString().IndentLiteral(indentation);
             }
 
             return _builder.ToString();
