@@ -49,8 +49,8 @@ namespace ObjectLiteralWriter.Test
             Assert.AreEqual(
 @"new Test1()
 {
-Foo = 0,
 Bar = 0,
+Foo = 0,
 }", output);
         }
 
@@ -75,8 +75,8 @@ Bar = 0,
             Assert.AreEqual(
 @"new Test1()
 {
-Foo = 1,
 Bar = 0,
+Foo = 1,
 }", output);
         }
 
@@ -104,5 +104,50 @@ Bar = 0,
 Bar = 0,
 }", output);
         }
+
+        public class Test2
+        {
+            public int AAA;
+            public int BBB;
+            public int CCC { get; set; }
+            public int DDD{ get; set; }
+        }
+
+        [Test]
+        public void CustomPropertyOrder()
+        {
+            var subj = new Test2();
+            
+             var writer = new ObjectLiteralWriter 
+            { 
+                SkipMembersWithDefaultValue = false
+            };
+            var output = writer.GetLiteral(subj);
+            Assert.AreEqual(
+@"new Test2()
+{
+AAA = 0,
+BBB = 0,
+CCC = 0,
+DDD = 0,
+}", output);
+
+            writer = new ObjectLiteralWriter 
+            { 
+                FieldOrderer = (fields, target) => fields.OrderByDescending(x => x.Name),
+                PropertyOrderer = (props, target) => props.OrderByDescending(x => x.Name),
+                SkipMembersWithDefaultValue = false
+            };
+            output = writer.GetLiteral(subj);
+            Assert.AreEqual(
+@"new Test2()
+{
+BBB = 0,
+AAA = 0,
+DDD = 0,
+CCC = 0,
+}", output);
+        }
+
     }
 }

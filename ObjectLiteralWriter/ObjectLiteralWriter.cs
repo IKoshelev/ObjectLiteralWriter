@@ -44,6 +44,17 @@ namespace ObjectLiteralWriter
             set;
         }
 
+        /// <summary>
+        /// Function determines order of properties
+        /// </summary>
+        Func<IEnumerable<PropertyInfo>, object, IEnumerable<PropertyInfo>> PropertyOrderer { get; set; }
+
+        /// <summary>
+        /// Function determines order of fields
+        /// </summary>
+        Func<IEnumerable<FieldInfo>, object, IEnumerable<FieldInfo>> FieldOrderer { get; set; }
+
+
         IObjectLiteralWriter Clone();
     }
 
@@ -57,7 +68,9 @@ namespace ObjectLiteralWriter
             {
                 SkipMembersWithDefaultValue = this.SkipMembersWithDefaultValue,
                 CustomLiteralWriter = this.CustomLiteralWriter,
-                CustomMemberWriter = this.CustomMemberWriter
+                CustomMemberWriter = this.CustomMemberWriter,
+                PropertyOrderer = this.PropertyOrderer,
+                FieldOrderer = this.FieldOrderer
             };
         }
 
@@ -80,6 +93,16 @@ namespace ObjectLiteralWriter
         /// Return empty string to skip writing this member.
         /// </summary>
         public Func<PropertyInfo, FieldInfo, object, string> CustomMemberWriter { get; set; }
+
+        /// <summary>
+        /// Function determines order of properties
+        /// </summary>
+        public Func<IEnumerable<PropertyInfo>, object, IEnumerable<PropertyInfo>> PropertyOrderer { get; set; } = (props, target) => props.OrderBy(x => x.Name);
+
+        /// <summary>
+        /// Function determines order of fields
+        /// </summary>
+        public Func<IEnumerable<FieldInfo>, object, IEnumerable<FieldInfo>> FieldOrderer { get; set; } = (fields, target) => fields.OrderBy(x => x.Name);
 
         public string GetLiteral(
             object target,
@@ -425,8 +448,10 @@ namespace ObjectLiteralWriter
 
         private string GetFieldInitSection(Type targetType, object target)
         {
-            var fieldInits = targetType
-                .GetFields()
+            var fieldInits = 
+                this.FieldOrderer(
+                    targetType.GetFields(),
+                    target)
                 .Select(x =>
                 {
                     var customWriterResult = SafeGetCustomMemberResult(null, x, target);
@@ -454,8 +479,10 @@ namespace ObjectLiteralWriter
 
         private string GetPropertyInitSection(Type targetType, object target)
         {
-            var fieldInits = targetType
-                .GetProperties()
+            var propertyInits = 
+                this.PropertyOrderer(
+                    targetType.GetProperties(),
+                    target)
                 .Select(x =>
                 {
                     var customWriterResult = SafeGetCustomMemberResult(x, null, target);
@@ -478,7 +505,7 @@ namespace ObjectLiteralWriter
                 })
                 .ToArray();
 
-            return string.Join("", fieldInits);
+            return string.Join("", propertyInits);
         }
 
         private string SafeGetCustomMemberResult(PropertyInfo propInfo, FieldInfo fieldInfo, object target)
@@ -489,7 +516,6 @@ namespace ObjectLiteralWriter
             }
             return CustomMemberWriter(propInfo, fieldInfo, target);
         }
-
         
         private void AppendDateOnly(object target)
         {

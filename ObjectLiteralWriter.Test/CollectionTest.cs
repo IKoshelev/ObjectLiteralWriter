@@ -73,12 +73,12 @@ namespace ObjectLiteralWriter.Test
 {
 1.1M,new Test1()
 {
-Foo = 1.1M,
 Bar = new Test1()
 {
-Foo = -3.3M,
 Bar = null,
+Foo = -3.3M,
 },
+Foo = 1.1M,
 }
 },
 {
@@ -92,11 +92,11 @@ Bar = null,
 {
 1.1M,new Test1()
 {
-Foo = 1.1M,
 Bar = new Test1()
 {
 Foo = -3.3M,
 },
+Foo = 1.1M,
 }
 },
 {
@@ -157,12 +157,12 @@ Foo = -3.3M,
 {
 new Test1()
 {
-Foo = 1.1M,
 Bar = new Test1()
 {
-Foo = -3.3M,
 Bar = null,
+Foo = -3.3M,
 },
+Foo = 1.1M,
 },
 null,
 }");
@@ -172,11 +172,11 @@ null,
 {
 new Test1()
 {
-Foo = 1.1M,
 Bar = new Test1()
 {
 Foo = -3.3M,
 },
+Foo = 1.1M,
 },
 null,
 }", true);
@@ -234,12 +234,12 @@ null,
 {
 new Test1()
 {
-Foo = 1.1M,
 Bar = new Test1()
 {
-Foo = -3.3M,
 Bar = null,
+Foo = -3.3M,
 },
+Foo = 1.1M,
 },
 null,
 }");
@@ -249,11 +249,11 @@ null,
 {
 new Test1()
 {
-Foo = 1.1M,
 Bar = new Test1()
 {
 Foo = -3.3M,
 },
+Foo = 1.1M,
 },
 null,
 }", true);
@@ -282,8 +282,8 @@ null,
 {
 new Test1()
 {
-Foo = 1.1M,
 Bar = null,
+Foo = 1.1M,
 },
 null,
 1,

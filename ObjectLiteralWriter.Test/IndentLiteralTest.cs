@@ -67,8 +67,8 @@ new object(),
 {
   new Test1()
   {
-    Foo = 1.1M,
     Bac = (1, 2, 3),
+    Foo = 1.1M,
   },
   null,
   1,

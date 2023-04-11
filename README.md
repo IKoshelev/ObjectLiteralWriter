@@ -37,8 +37,8 @@ var literal = new ObjectLiteralWriter.ObjectLiteralWriter().GetLiteral(subj, ind
 {
     new Test1()
     {
-        Foo = 1.1M,
         Bac = (1, 2, 3),
+        Foo = 1.1M,
     },
     new DateTime(1, 2, 3, 4, 0, 0, DateTimeKind.Utc),
     null,
@@ -80,4 +80,17 @@ Func<PropertyInfo, FieldInfo, object, string> CustomMemberWriter
     get;
     set;
 }
+
+/// <summary>
+/// Function determines order of properties
+/// </summary>
+public Func<IEnumerable<PropertyInfo>, object, IEnumerable<PropertyInfo>> PropertyOrderer { get; set; } 
+    = (props, target) => props.OrderBy(x => x.Name);
+
+/// <summary>
+/// Function determines order of fields
+/// </summary>
+public Func<IEnumerable<FieldInfo>, object, IEnumerable<FieldInfo>> FieldOrderer { get; set; } 
+    = (fields, target) => fields.OrderBy(x => x.Name);
+
 ```

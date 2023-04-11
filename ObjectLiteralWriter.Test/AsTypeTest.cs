@@ -36,8 +36,8 @@ namespace ObjectLiteralWriter.Test
             Assert.AreEqual(
 @"new Test2()
 {
-T2 = 2,
 T1 = 1,
+T2 = 2,
 }"
 , output);
 
@@ -46,8 +46,8 @@ T1 = 1,
             Assert.AreEqual(
 @"new Test2()
 {
-T2 = 2,
 T1 = 1,
+T2 = 2,
 }"
 , output);
 
@@ -134,8 +134,8 @@ T1 = 0,
 },
 new Test2()
 {
-T2 = 0,
 T1 = 0,
+T2 = 0,
 },
 }"
             , output);
